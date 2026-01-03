@@ -10,6 +10,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.*;
 import org.bukkit.entity.Display;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.TextDisplay;
 import org.bukkit.event.EventHandler;
@@ -78,6 +79,11 @@ public class BlockPlaceListener implements Listener {
 
                 World world = player.getWorld();
                 Location textDisplayLocation = new Location(world, location.getX() + 0.5, location.getY() + 1.0, location.getZ() + 0.5);
+
+                world.getNearbyEntities(textDisplayLocation, 0.5, 0.5, 0.5).stream()
+                        .filter(e -> e instanceof TextDisplay)
+                        .forEach(Entity::remove);
+
                 TextDisplay display = world.spawn(textDisplayLocation, TextDisplay.class, entity -> {
                     entity.text(startText);
                     entity.setBillboard(Display.Billboard.CENTER);
@@ -165,6 +171,11 @@ public class BlockPlaceListener implements Listener {
 
                     World world = player.getWorld();
                     Location textDisplayLocation = new Location(world, location.getX() + 0.5, location.getY() + 1.0, location.getZ() + 0.5);
+
+                    world.getNearbyEntities(textDisplayLocation, 0.5, 0.5, 0.5).stream()
+                            .filter(e -> e instanceof TextDisplay)
+                            .forEach(Entity::remove);
+
                     TextDisplay display = world.spawn(textDisplayLocation, TextDisplay.class, entity -> {
                         entity.text(endText);
                         entity.setBillboard(Display.Billboard.CENTER);
@@ -245,6 +256,11 @@ public class BlockPlaceListener implements Listener {
                     Component checkpointText = textFormatter.formatString(ConfigManager.getFormat().getCheckpointPlate(), placeholders);
                     World world = player.getWorld();
                     Location textDisplayLocation = new Location(world, location.getX() + 0.5, location.getY() + 1.0, location.getZ() + 0.5);
+
+                    world.getNearbyEntities(textDisplayLocation, 0.5, 0.5, 0.5).stream()
+                            .filter(e -> e instanceof TextDisplay)
+                            .forEach(Entity::remove);
+
                     TextDisplay display = world.spawn(textDisplayLocation, TextDisplay.class, entity -> {
                         entity.text(checkpointText);
                         entity.setBillboard(Display.Billboard.CENTER);
@@ -284,6 +300,11 @@ public class BlockPlaceListener implements Listener {
             Component checkpointText = textFormatter.formatString(ConfigManager.getFormat().getCheckpointPlate(), placeholders);
             World world = player.getWorld();
             Location textDisplayLocation = new Location(world, location.getX() + 0.5, location.getY() + 1.0, location.getZ() + 0.5);
+
+            world.getNearbyEntities(textDisplayLocation, 0.5, 0.5, 0.5).stream()
+                    .filter(e -> e instanceof TextDisplay)
+                    .forEach(Entity::remove);
+
             TextDisplay display = world.spawn(textDisplayLocation, TextDisplay.class, entity -> {
                 entity.text(checkpointText);
                 entity.setBillboard(Display.Billboard.CENTER);
