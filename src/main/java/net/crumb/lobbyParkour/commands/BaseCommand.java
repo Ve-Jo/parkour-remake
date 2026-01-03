@@ -61,7 +61,9 @@ public class BaseCommand {
                     .executes(ctx -> {
                         CommandSender sender = ctx.getSource().getSender();
                         if (sender instanceof Player player) {
-                            LeaderboardMenu.openMenu(player);
+                            MMUtils.sendMessage(player, "This feature is currently unavailable", MessageType.ERROR);
+                            SoundUtils.playSoundSequence(player, Sound.BLOCK_ANVIL_LAND, 1.0f, 1.1f, 0);
+                            // LeaderboardMenu.openMenu(player);
                         }
                         return Command.SINGLE_SUCCESS;
                     })
