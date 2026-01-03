@@ -82,7 +82,10 @@ public class InventoryClickListener implements Listener {
             }
 
             if (displayName.equals("✯ Parkour Leaderboards")) {
-                LeaderboardMenu.openMenu(player);
+                player.getOpenInventory().close();
+                MMUtils.sendMessage(player, "This feature is currently unavailable", MessageType.ERROR);
+                SoundUtils.playSoundSequence(player, Sound.BLOCK_ANVIL_LAND, 1.0f, 1.1f, 0);
+                // LeaderboardMenu.openMenu(player);
             }
 
         }
