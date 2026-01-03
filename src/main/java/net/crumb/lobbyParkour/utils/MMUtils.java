@@ -17,7 +17,7 @@ public class MMUtils {
     }
 
     public static void sendMessage(Player player, String message, MessageType messageType) {
-        Component prefix = Component.empty();
+        Component prefix;
         Component parsed;
 
         switch (messageType) {
@@ -33,9 +33,10 @@ public class MMUtils {
                 prefix = mm.deserialize("<color:#ad1f39>☒</color> ");
                 parsed = mm.deserialize("<color:#ff3358>" + message + "</color>");
                 break;
-            case NONE:
-                player.sendMessage(mm.deserialize(message));
-                return;
+            case DEBUG:
+                prefix = mm.deserialize("<color:##ed3ef0>?</color> ");
+                parsed = mm.deserialize("<color:#ffffff>" + message + "</color>");
+                break;
             default:
                 player.sendMessage(mm.deserialize(message));
                 return;

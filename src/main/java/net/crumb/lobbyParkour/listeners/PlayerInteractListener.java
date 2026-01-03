@@ -23,8 +23,6 @@ import org.bukkit.entity.TextDisplay;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.MenuType;
@@ -32,8 +30,6 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.view.AnvilView;
 import org.bukkit.util.RayTraceResult;
 
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
 
@@ -42,7 +38,6 @@ import static net.crumb.lobbyParkour.utils.PressurePlates.isPressurePlate;
 public class PlayerInteractListener implements Listener {
     private static final LobbyParkour plugin = LobbyParkour.getInstance();
     private static final TextFormatter textFormatter = new TextFormatter();
-    private static String parkourName = "";
     private static final LeaderboardUpdater updater = LeaderboardUpdater.getInstance();
 
 
@@ -56,6 +51,8 @@ public class PlayerInteractListener implements Listener {
             if (block == null) return;
             Location location = block.getLocation();
             if (location == null) return;
+
+            String parkourName;
 
             try {
                 ParkoursDatabase database = new ParkoursDatabase(plugin.getDataFolder().getAbsolutePath() + "/lobby_parkour.db");
@@ -79,14 +76,14 @@ public class PlayerInteractListener implements Listener {
                         }
                     });
 
-                    if (parkourId == null) {
+                    if (parkourId[0] == null) {
                         MMUtils.sendMessage(player, "Could not find parkour id of the checkpoint.", MessageType.ERROR);
                         return;
                     }
 
                     List<Object[]> pkCheckpoints = query.getCheckpoints(parkourId[0]);
                     if (pkCheckpoints.isEmpty()) {
-                        MMUtils.sendMessage(player, "No checkpoints found for parkour with id " + parkourId + ".", MessageType.ERROR);
+                        MMUtils.sendMessage(player, "No checkpoints found for parkour with id " + parkourId[0] + ".", MessageType.ERROR);
                         return;
                     }
 
@@ -97,7 +94,7 @@ public class PlayerInteractListener implements Listener {
                 if (isPkStart) {
                     // Open the manage menu of the parkour
                     parkourName = query.getMapnameByPkSpawn(location);
-                    if (parkourName.isEmpty()) return;
+                    if (parkourName == null || parkourName.isEmpty()) return;
                     MapManageMenu.openMenu(player, parkourName);
                 } else if (isPkEnd) {
                     // Open the edit menu for the end plate
@@ -137,6 +134,8 @@ public class PlayerInteractListener implements Listener {
                 boolean isPkEnd = false;
                 boolean isCheckpoint = false;
 
+                String parkourName = "";
+
                 try {
                     ParkoursDatabase database = new ParkoursDatabase(plugin.getDataFolder().getAbsolutePath() + "/lobby_parkour.db");
                     Query query = new Query(database.getConnection());
@@ -157,14 +156,17 @@ public class PlayerInteractListener implements Listener {
                     } else if (isPkEnd) {
                         parkourName = query.getMapNameByPkEnd(location);
                     } else if (isCheckpoint) {
-                        parkourName = query.getParkourNameById(query.getParkourIdByCheckpointLocation(LocationHelper.locationToString(location)));
+                        int parkourId = query.getParkourIdByCheckpointLocation(LocationHelper.locationToString(location));
+                        parkourName = query.getParkourNameById(parkourId);
                     }
 
                 } catch (SQLException ex) {
                     ex.printStackTrace();
                 }
 
-                if (parkourName.isEmpty()) return;
+                if (parkourName == null || parkourName.isEmpty()) return;
+
+                String finalParkourName = parkourName;
 
 
                 // Check if the player is starting a parkour
@@ -204,7 +206,7 @@ public class PlayerInteractListener implements Listener {
                             Location tpLoc = new Location(location.getWorld(), location.getX(), location.getY(), location.getZ(), player.getYaw(), player.getPitch());
                             p.teleport(tpLoc);
                             Component resetMessage = textFormatter.formatString(ConfigManager.getFormat().getResetMessage(), player, Map.of(
-                                    "parkour_name", parkourName,
+                                    "parkour_name", finalParkourName,
                                     "player_name", player.getName(),
                                     "timer", timer
                             ));
@@ -218,7 +220,7 @@ public class PlayerInteractListener implements Listener {
 
                                 // Send leave/cancel message
                                 Component leaveMessage = textFormatter.formatString(ConfigManager.getFormat().getCancelMessage(), player, Map.of(
-                                        "parkour_name", parkourName,
+                                        "parkour_name", finalParkourName,
                                         "player_name", player.getName(),
                                         "timer", timer
                                 ));
@@ -232,11 +234,11 @@ public class PlayerInteractListener implements Listener {
                                 ParkoursDatabase database = new ParkoursDatabase(plugin.getDataFolder().getAbsolutePath() + "/lobby_parkour.db");
                                 Query query = new Query(database.getConnection());
                                 Location loc = null;
-                                int parkourId = query.getParkourIdFromName(parkourName);
+                                int parkourId = query.getParkourIdFromName(finalParkourName);
                                 if (lastIndex != 0) {
                                     loc = query.getCheckpointLocation(parkourId, lastIndex);
                                 } else {
-                                    loc = query.getStartLocation(parkourName);
+                                    loc = query.getStartLocation(finalParkourName);
                                 }
 
                                 Location teleportLocation = new Location(loc.getWorld(), loc.getX(), loc.getY(), loc.getZ(), player.getYaw(), player.getPitch());
@@ -298,6 +300,9 @@ public class PlayerInteractListener implements Listener {
                         ));
 
                         player.sendMessage(endMessage);
+                        SoundUtils.playSoundSequence(player, Sound.BLOCK_NOTE_BLOCK_PLING, 0.9f, 1.3f, 0);
+                        SoundUtils.playSoundSequence(player, Sound.BLOCK_NOTE_BLOCK_PLING, 0.9f, 1.6f, 4);
+                        SoundUtils.playSoundSequence(player, Sound.BLOCK_NOTE_BLOCK_PLING, 0.9f, 1.9f, 8);
                     }
                 } else if (isCheckpoint) {
                     UUID uuid = player.getUniqueId();
