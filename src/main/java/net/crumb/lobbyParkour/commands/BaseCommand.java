@@ -1,11 +1,13 @@
 package net.crumb.lobbyParkour.commands;
 
+import com.mojang.brigadier.Command;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.tree.LiteralCommandNode;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
 import net.crumb.lobbyParkour.LobbyParkour;
+import net.crumb.lobbyParkour.guis.LeaderboardMenu;
 import net.crumb.lobbyParkour.guis.MainMenu;
 import net.crumb.lobbyParkour.systems.LeaderboardManager;
 import net.crumb.lobbyParkour.systems.LeaderboardUpdater;
@@ -34,9 +36,8 @@ public class BaseCommand {
                 CommandSender sender = ctx.getSource().getSender();
                 if (sender instanceof Player player) {
                     MainMenu.openMenu(player);
-                    return 1;
                 }
-                return 0;
+                return Command.SINGLE_SUCCESS;
             })
             .then(Commands.literal("help")
                     .executes(ctx -> {
@@ -44,7 +45,7 @@ public class BaseCommand {
                         sender.sendMessage(mm.deserialize("<aqua>/lpk <gray>- Opens the main menu"));
                         sender.sendMessage(mm.deserialize("<aqua>/lpk credits <gray>- Shows a credits message"));
                         sender.sendMessage(mm.deserialize("<aqua>/lpk help <gray>- Shows a list of available commands"));
-                        return 1;
+                        return Command.SINGLE_SUCCESS;
                     })
             )
             .then(Commands.literal("credits")
@@ -53,18 +54,16 @@ public class BaseCommand {
                         if (sender instanceof Player player) {
                             sendCredits(player);
                         }
-                        return 1;
+                        return Command.SINGLE_SUCCESS;
                     })
             )
-            .then(Commands.literal("leaderboard")
+            .then(Commands.literal("leaderboards")
                     .executes(ctx -> {
                         CommandSender sender = ctx.getSource().getSender();
                         if (sender instanceof Player player) {
-                            LeaderboardManager leaderboardManager = new LeaderboardManager();
-                            leaderboardManager.spawnLeaderboard(player.getLocation(), "Default");
-                            return 1;
+                            LeaderboardMenu.openMenu(player);
                         }
-                        return 0;
+                        return Command.SINGLE_SUCCESS;
                     })
             )
             .then(Commands.literal("cache")
@@ -96,6 +95,7 @@ public class BaseCommand {
             );
 
 
+
     LiteralCommandNode<CommandSourceStack> buildCommand = baseCommand.build();
 
     public LiteralCommandNode<CommandSourceStack> getBuildCommand() {
@@ -104,16 +104,17 @@ public class BaseCommand {
         
     private void sendCredits(Player player) {
         List<String> lines = List.of(
-                "<gradient:#d81bf5:#fa2dc3>━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━",
-                "<center><color:#d81bf5>✦ <bold><gradient:#d81bf5:#fa2dc3>ʟᴏʙʙʏ ᴘᴀʀᴋᴏᴜʀ</gradient> <reset><color:#fa2dc3>✦",
+                "<gradient:#d81bf5:#fa2dc3><st>                                                        </gradient>",
+                "    <color:#d81bf5>⭐ <bold><gradient:#d81bf5:#fa2dc3>ʟᴏʙʙʏ ᴘᴀʀᴋᴏᴜʀ</gradient> <reset><color:#fa2dc3>⭐",
                 "",
-                "<center>Brought to you by:  <gradient:#ffa300:#ff0500>crumb",
-                "<center>Developed by: Kalbskinder & ZetMine",
+                "    <gray>Brought to you by:</gray>  <gradient:#ffa300:#ff0500>crumb",
+                "    <gray>Developed by:</gray> Kalbskinder <gray>&</gray> ZetMine",
                 "",
-                "<center>✦ Join us at ✦",
-                "<center>→ <click:OPEN_URL:https://discord.gg/8xQXBbCa8R><hover:show_text:'<blue>Click to join!'><blue>https://discord.gg/8xQXBbCa8R",
-                "<gradient:#d81bf5:#fa2dc3>━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+                "    <dark_gray>»</dark_gray> Join us at <dark_gray>«</dark_gray>",
+                "        <dark_gray>→</dark_gray> <click:OPEN_URL:https://discord.gg/8xQXBbCa8R><hover:show_text:'<blue>Click to join!'><blue>https://discord.gg/8xQXBbCa8R    ",
+                "<gradient:#d81bf5:#fa2dc3><st>                                                        </gradient>"
         );
+
 
         lines.forEach(line -> {
             MMUtils.sendMessage(player, deserializeCentered(line));
