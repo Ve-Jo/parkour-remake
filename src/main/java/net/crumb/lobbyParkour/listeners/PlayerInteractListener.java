@@ -50,6 +50,7 @@ public class PlayerInteractListener implements Listener {
     public void onPlayerInteract(PlayerInteractEvent event) {
         Player player = event.getPlayer();
 
+        // Shift + right-click on pressure plate to open parkour manage menu
         if (player.isSneaking() && event.getAction() == Action.RIGHT_CLICK_BLOCK && player.hasPermission("lpk.admin") && PressurePlates.isPressurePlate(event.getClickedBlock().getType())) {
             Block block = event.getClickedBlock();
             if (block == null) return;
@@ -119,6 +120,7 @@ public class PlayerInteractListener implements Listener {
             RayTraceResult result = player.rayTraceEntities(5);
             if (result == null) return;
 
+            // FIX: does not work
             Entity hitEntity = result.getHitEntity();
             if (hitEntity instanceof TextDisplay textDisplay) {
                 player.sendMessage("You clicked on a TextDisplay!");
@@ -126,6 +128,7 @@ public class PlayerInteractListener implements Listener {
             }
         }
 
+        // Player stepped on a pressure plate
         if (event.getAction() == Action.PHYSICAL) {
             Block block = event.getClickedBlock();
             if (block != null && isPressurePlate(block.getType())) {
@@ -198,7 +201,8 @@ public class PlayerInteractListener implements Listener {
                         String timer = ParkourTimer.formatTimer(session.getElapsedSeconds(), ConfigManager.getFormat().getTimer(), player);
 
                         ItemActionHandler.registerAction(resetPkActionId, p -> {
-                            p.teleport(location);
+                            Location tpLoc = new Location(location.getWorld(), location.getX(), location.getY(), location.getZ(), player.getYaw(), player.getPitch());
+                            p.teleport(tpLoc);
                             Component resetMessage = textFormatter.formatString(ConfigManager.getFormat().getResetMessage(), player, Map.of(
                                     "parkour_name", parkourName,
                                     "player_name", player.getName(),
@@ -235,7 +239,7 @@ public class PlayerInteractListener implements Listener {
                                     loc = query.getStartLocation(parkourName);
                                 }
 
-                                Location teleportLocation = new Location(player.getWorld(), loc.getX(), loc.getY(), loc.getZ(), player.getYaw(), player.getPitch());
+                                Location teleportLocation = new Location(loc.getWorld(), loc.getX(), loc.getY(), loc.getZ(), player.getYaw(), player.getPitch());
                                 player.teleport(teleportLocation);
                             } catch (SQLException ex) {
                                 MMUtils.sendMessage(player, "Could not get checkpoints from database.", MessageType.ERROR);
