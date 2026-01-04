@@ -4,10 +4,7 @@ import net.crumb.lobbyParkour.LobbyParkour;
 import net.crumb.lobbyParkour.database.ParkoursDatabase;
 import net.crumb.lobbyParkour.database.Query;
 import net.crumb.lobbyParkour.guis.*;
-import net.crumb.lobbyParkour.systems.LeaderboardManager;
-import net.crumb.lobbyParkour.systems.ParkourSession;
-import net.crumb.lobbyParkour.systems.RelocateCheckpoint;
-import net.crumb.lobbyParkour.systems.RelocateSessionManager;
+import net.crumb.lobbyParkour.systems.*;
 import net.crumb.lobbyParkour.utils.*;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
@@ -179,6 +176,7 @@ public class InventoryClickListener implements Listener {
                     Component loreLine = event.getView().getItem(10).getItemMeta().lore().get(1);
                     String name = PlainTextComponentSerializer.plainText().serialize(loreLine);
 
+                    // Remove start plate and entity
                     Location startLocation = query.getStartLocation(name);
                     startLocation.getBlock().setType(Material.AIR);
 
@@ -189,6 +187,7 @@ public class InventoryClickListener implements Listener {
                     assert startEntity != null;
                     startEntity.remove();
 
+                    // Remove end plate and entity
                     Location endLocation = query.getEndLocation(name);
                     endLocation.getBlock().setType(Material.AIR);
 
@@ -198,6 +197,26 @@ public class InventoryClickListener implements Listener {
                     Entity endEntity = endLocationWorld.getEntity(endEntityUuid);
                     assert endEntity != null;
                     endEntity.remove();
+
+                    // Remove checkpoints and entities
+                    int parkourId = query.getParkourIdFromName(name);
+                    List<Object[]> checkpoints = query.getCheckpoints(parkourId);
+                    checkpoints.forEach(checkpoint -> {
+                        try {
+                            query.deleteCheckpoint(parkourId, (Integer) checkpoint[1]);
+                        } catch (SQLException ex) {
+                            ex.printStackTrace();
+                        }
+                        Location cpLocation = LocationHelper.stringToLocation(checkpoint[2].toString());
+                        cpLocation.getBlock().setType(Material.AIR);
+
+                        UUID cpEntityUuid = (UUID) checkpoint[4];
+                        World cpLocationWorld = cpLocation.getWorld();
+                        EntityRemove.suppress(cpEntityUuid);
+                        Entity cpEntity = cpLocationWorld.getEntity(cpEntityUuid);
+                        assert cpEntity != null;
+                        cpEntity.remove();
+                    });
 
                     query.deleteParkour(name);
 

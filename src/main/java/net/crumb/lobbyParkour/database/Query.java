@@ -511,6 +511,15 @@ public class Query {
         return null;
     }
 
+    public void deleteCheckpoint(int parkourId, int checkpointIndex) throws SQLException {
+        String sql = "DELETE FROM checkpoints WHERE parkour_id = ? AND cp_index = ?";
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setInt(1, parkourId);
+            stmt.setInt(2, checkpointIndex);
+            stmt.executeUpdate();
+        }
+    }
+
     public void updateLeaderboardLineEntityUuid(UUID oldUuid, UUID newUuid) throws SQLException {
         String sql = "UPDATE leaderboard_lines SET entity_uuid = ? WHERE entity_uuid = ?";
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
