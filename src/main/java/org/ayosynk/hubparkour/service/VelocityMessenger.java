@@ -8,7 +8,6 @@ import org.ayosynk.hubparkour.util.TextFormatter;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.plugin.messaging.PluginMessageListener;
 
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;

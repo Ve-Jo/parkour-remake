@@ -16,6 +16,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
@@ -128,6 +129,6 @@ public class PlateHologramService {
     }
 
     private String buildName(int parkourId, String suffix) {
-        return "hubparkour-plate-" + parkourId + "-" + suffix;
+        return plugin.getName().toLowerCase(Locale.ROOT) + "-plate-" + parkourId + "-" + suffix;
     }
 }

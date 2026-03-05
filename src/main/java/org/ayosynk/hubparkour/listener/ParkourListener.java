@@ -1,7 +1,6 @@
 package org.ayosynk.hubparkour.listener;
 
 import org.ayosynk.hubparkour.model.Checkpoint;
-import org.ayosynk.hubparkour.model.Parkour;
 import org.ayosynk.hubparkour.service.ParkourService;
 import org.ayosynk.hubparkour.util.LocationUtil;
 import org.ayosynk.hubparkour.util.PressurePlateUtil;

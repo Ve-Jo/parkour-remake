@@ -9,7 +9,6 @@ import org.ayosynk.hubparkour.service.ParkourGuiService;
 import org.ayosynk.hubparkour.service.ParkourService;
 import org.ayosynk.hubparkour.util.PressurePlateUtil;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;

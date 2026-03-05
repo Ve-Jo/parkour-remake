@@ -1,5 +1,6 @@
 package org.ayosynk.hubparkour.service;
 
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.ayosynk.hubparkour.config.PluginConfig;
 import org.ayosynk.hubparkour.model.Checkpoint;
 import org.ayosynk.hubparkour.model.Parkour;
@@ -22,6 +23,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 public class ParkourService {
+    private static final LegacyComponentSerializer LEGACY_SERIALIZER = LegacyComponentSerializer.legacySection();
     private final PluginConfig config;
     private final ParkourRepository repository;
     private final ParkourCache cache;
@@ -276,10 +278,10 @@ public class ParkourService {
         ItemStack item = new ItemStack(material);
         ItemMeta meta = item.getItemMeta();
         if (meta != null) {
-            meta.setDisplayName(name);
+            meta.displayName(LEGACY_SERIALIZER.deserialize(name));
             meta.getPersistentDataContainer().set(controlKey, PersistentDataType.STRING, action);
             if (loreLine != null && !loreLine.isBlank()) {
-                meta.setLore(java.util.List.of(loreLine));
+                meta.lore(java.util.List.of(LEGACY_SERIALIZER.deserialize(loreLine)));
             }
             item.setItemMeta(meta);
         }

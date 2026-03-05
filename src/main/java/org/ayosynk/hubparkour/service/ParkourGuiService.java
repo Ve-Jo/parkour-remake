@@ -1,5 +1,9 @@
 package org.ayosynk.hubparkour.service;
 
+import io.papermc.paper.event.player.AsyncChatEvent;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.ayosynk.hubparkour.model.Checkpoint;
 import org.ayosynk.hubparkour.model.Parkour;
 import org.ayosynk.hubparkour.repository.ParkourRepository;
@@ -15,7 +19,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
-import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -30,6 +33,8 @@ import java.util.Optional;
 import java.util.UUID;
 
 public class ParkourGuiService implements Listener {
+    private static final LegacyComponentSerializer LEGACY_SERIALIZER = LegacyComponentSerializer.legacySection();
+    private static final PlainTextComponentSerializer PLAIN_TEXT_SERIALIZER = PlainTextComponentSerializer.plainText();
     private static final String ADMIN_TITLE = "Parkour Admin";
     private static final String SETUP_TITLE_PREFIX = "Parkour Setup: ";
     private static final String PLAYER_TITLE = "Parkour";
@@ -74,7 +79,7 @@ public class ParkourGuiService implements Listener {
     }
 
     public void openAdminGui(Player player) {
-        Inventory inventory = Bukkit.createInventory(player, 27, ADMIN_TITLE);
+        Inventory inventory = Bukkit.createInventory(player, 27, Component.text(ADMIN_TITLE));
         int slot = 0;
         for (Parkour parkour : cache.getAllParkours().values()) {
             if (slot >= 26) {
@@ -89,7 +94,7 @@ public class ParkourGuiService implements Listener {
     }
 
     public void openPlayerGui(Player player) {
-        Inventory inventory = Bukkit.createInventory(player, 9, PLAYER_TITLE);
+        Inventory inventory = Bukkit.createInventory(player, 9, Component.text(PLAYER_TITLE));
         inventory.setItem(2, createItem(Material.SLIME_BALL, "§aStart Over", KEY_RESTART, List.of("§7Restart current run")));
         inventory.setItem(4, createItem(Material.ENDER_PEARL, "§eLast Checkpoint", KEY_LAST, List.of("§7Teleport to last checkpoint")));
         inventory.setItem(6, createItem(Material.BARRIER, "§cLeave", KEY_LEAVE, List.of("§7Cancel current run")));
@@ -98,7 +103,7 @@ public class ParkourGuiService implements Listener {
     }
 
     private void openSetupGui(Player player, Parkour parkour) {
-        Inventory inventory = Bukkit.createInventory(player, 27, SETUP_TITLE_PREFIX + parkour.name());
+        Inventory inventory = Bukkit.createInventory(player, 27, Component.text(SETUP_TITLE_PREFIX + parkour.name()));
         inventory.setItem(10, createItem(Material.LIME_WOOL, "§aSet Start", KEY_SET_START, List.of("§7Look at/stand on plate")));
         inventory.setItem(11, createItem(Material.RED_WOOL, "§cSet End", KEY_SET_END, List.of("§7Look at/stand on plate")));
         inventory.setItem(12, createItem(Material.LIGHT_BLUE_WOOL, "§bAdd Checkpoint", KEY_ADD_CHECKPOINT, List.of("§7Look at/stand on plate")));
@@ -119,7 +124,7 @@ public class ParkourGuiService implements Listener {
         if (context == null) {
             return;
         }
-        String title = event.getView().getTitle();
+        String title = PLAIN_TEXT_SERIALIZER.serialize(event.getView().title());
         if (!title.equals(ADMIN_TITLE) && !title.startsWith(SETUP_TITLE_PREFIX) && !title.equals(PLAYER_TITLE)) {
             return;
         }
@@ -139,7 +144,7 @@ public class ParkourGuiService implements Listener {
                 cache.getParkourById(parkourId).ifPresent(parkour -> openSetupGui(player, parkour));
                 return;
             }
-            String name = stripColor(meta.getDisplayName());
+            String name = stripColor(PLAIN_TEXT_SERIALIZER.serialize(meta.displayName() == null ? Component.empty() : meta.displayName()));
             cache.getParkourByName(name).ifPresent(parkour -> openSetupGui(player, parkour));
             return;
         }
@@ -206,13 +211,13 @@ public class ParkourGuiService implements Listener {
     }
 
     @EventHandler
-    public void onChat(AsyncPlayerChatEvent event) {
+    public void onChat(AsyncChatEvent event) {
         PendingAction pending = pendingActions.remove(event.getPlayer().getUniqueId());
         if (pending == null) {
             return;
         }
         event.setCancelled(true);
-        String name = event.getMessage().trim();
+        String name = PLAIN_TEXT_SERIALIZER.serialize(event.message()).trim();
         if (name.isEmpty()) {
             event.getPlayer().sendMessage("§cName cannot be empty.");
             return;
@@ -348,10 +353,10 @@ public class ParkourGuiService implements Listener {
         ItemStack item = new ItemStack(material);
         ItemMeta meta = item.getItemMeta();
         if (meta != null) {
-            meta.setDisplayName(name);
+            meta.displayName(LEGACY_SERIALIZER.deserialize(name));
             meta.getPersistentDataContainer().set(guiKey, PersistentDataType.STRING, key);
             if (lore != null && !lore.isEmpty()) {
-                meta.setLore(lore);
+                meta.lore(lore.stream().map(LEGACY_SERIALIZER::deserialize).toList());
             }
             item.setItemMeta(meta);
         }
