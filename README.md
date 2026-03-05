@@ -12,6 +12,12 @@ Fork of [Crumb-Network/Lobby-Parkour](https://github.com/Crumb-Network/Lobby-Par
 * Configurable global top announcement behavior
 * More hub-oriented formatting and messaging defaults
 
+## Screenshot
+
+### Parkour leaderboard
+
+![Parkour leaderboard display](docs/screenshots/parkour-leaderboard.jpg)
+
 ## Core Features
 
 * Start, end, and checkpoint plates
