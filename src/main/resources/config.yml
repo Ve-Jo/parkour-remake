@@ -1,17 +1,19 @@
-# ==============================================================================
-#
-#                           LOBBY PARKOUR - BY CRUMB
-#
-# This config supports PlaceholderAPI and MiniMessage. Custom placeholders
-# are written BEFORE the field where they can be used.
-#
-# NOTE: PlaceholderAPI is not supported in all settings at the moment.
-#
-# License: MIT License
-#          Copyright (c) 2025 Crumb Network
-#          See LICENSE file or https://opensource.org/licenses/MIT for details.
-#
-# ==============================================================================
+database:
+  enabled: true
+  host: localhost
+  port: 3306
+  name: parkour
+  user: root
+  password: "change-me"
+  pool-size: 10
+  use-ssl: false
+  create-database: true
+
+parkour:
+  allow-fly: false
+  timeout-seconds: 0
+  action-bar-enabled: true
+  action-bar-interval-ticks: 1
 
 formatting:
   # %parkour_name% -> The name of the parkour
@@ -28,47 +30,44 @@ formatting:
 
   # %parkour_name% -> The name of the parkour
   # %player_name% -> The name of the player
-  start-message: "<color:#ff9c40>☄</color> <color:#474747>»</color> <color:#ffed8a>You have started <white>%parkour_name%</white>. Good Luck!</color>"
-  cancel-message: "<color:#ff9c40>☄</color> <color:#474747>»</color> <color:#ffed8a>You have cancelled your run. Retry next time!</color>"
+  start-message: "<color:#ff9c40>☄</color> <color:#474747>»</color> <color:#ffed8a>Вы начали <white>%parkour_name%</white>. Удачи!</color>"
+  cancel-message: "<color:#ff9c40>☄</color> <color:#474747>»</color> <color:#ffed8a>Вы отменили своё прохождение. Попробуйте в следующий раз!</color>"
   # %timer% -> The current timer (formatted previously)
-  end-message: "<color:#ff9c40>☄</color> <color:#474747>»</color> <color:#ffed8a>You have finished the parkour in <white>%timer%</white>. <color:#ffc157><b>ɢɢ!</b></color></color>"
-  reset-message: "<color:#ff9c40>☄</color> <color:#474747>»</color> <color:#ffed8a>You have reset your run for <white>%parkour_name%</white>. Good luck!</color>"
+  end-message: "<color:#ff9c40>☄</color> <color:#474747>»</color> <color:#ffed8a>Вы завершили паркур за <white>%timer%</white>. <color:#ffc157><b>ɢɢ!</b></color></color>"
+  reset-message: "<color:#ff9c40>☄</color> <color:#474747>»</color> <color:#ffed8a>Вы сбросили своё прохождение для <white>%parkour_name%</white>. Удачи!</color>"
   # %checkpoint% -> The number of the checkpoint
-  tp-message: "<color:#ff9c40>☄</color> <color:#474747>»</color> <color:#ffed8a>You have been teleported to your last checkpoint.</color>"
-  checkpoint-message: "<color:#ff9c40>☄</color> <color:#474747>»</color> <color:#ffed8a>You have reached <white>Checkpoint #%checkpoint%</white> in <white>%timer%</white>.</color>"
+  tp-message: "<color:#ff9c40>☄</color> <color:#474747>»</color> <color:#ffed8a>Вы были телепортированы к вашему последнему чекпоинту.</color>"
+  checkpoint-message: "<color:#ff9c40>☄</color> <color:#474747>»</color> <color:#ffed8a>Вы достигли <white>чекпоинта №%checkpoint%</white> за <white>%timer%</white>.</color>"
   # No placeholders supported
-  checkpoint-skip-message: "<color:#ff9c40>☄</color> <color:#474747>»</color> <color:#ffed8a>You've missed a checkpoint!"
+  checkpoint-skip-message: "<color:#ff9c40>☄</color> <color:#474747>»</color> <color:#ffed8a>Вы пропустили чекпоинт!"
 
   # The action bar will be displayed while a player is doing a parkour.
   # %parkour_name% -> The name of the parkour
   # %player_name% -> The name of the player
   # %timer% -> The current timer (formatted previously)
+  # %record% -> Current record time
   # %checkpoint% -> The number of the checkpoint
   # %checkpoint_total% -> The total number of checkpoints (excluding start and end)
-  action-bar: "<color:#7ae0ff>%timer%</color> <color:#39aacc>⌚</color>   <dark_gray>|</dark_gray>   <color:#54ff7f><color:#57ff65>%checkpoint%</color></color><color:#b8b8b8>/%checkpoint_total%</color> <green>⚑</green>"
+  action-bar: "<color:#7ae0ff>%timer%</color> <color:#39aacc>⌚</color>   <dark_gray>|</dark_gray>   <color:#ffc157>Record:</color> <yellow>%record%</yellow>   <dark_gray>|</dark_gray>   <color:#54ff7f><color:#57ff65>%checkpoint%</color></color><color:#b8b8b8>/%checkpoint_total%</color> <green>⚑</green>"
 
-  leaderboard:
+leaderboards:
+  enabled: true
+  update-interval-ticks: 100
+  query-interval-ticks: 200
+  broadcast-top: 5
+
+  formatting:
     # %parkour_name% -> The name of the parkour
-    title: "<red>%parkour_name%"
-
-    # The display item will be shown above the title if enabled. (It will rotate like a dropped item.)
-    display-item:
-      enabled: true
-      item: "minecraft:stone"
-      enchant-glint: true
-      spin-enabled: true
-
+    title: "<gradient:#6efcff:#5a7dff><bold>Лучшие результаты</bold></gradient> <gray>•</gray> <white>%parkour_name%</white>"
     maximum-displayed: 10
-    # The personal best will be displayed below the leaderboard
     personal-best-enabled: false
 
     # %position% -> The score position on the leaderboard (does not include #)
     # %player_name% -> The name of the player
     # %timer% -> The completion timer (formatted previously)
-    default-line-style: "#%position% - %player%: %timer%"
+    default-line-style: "<aqua>#%position%</aqua> <dark_gray>•</dark_gray> <white>%player_name%</white> <gray>—</gray> <color:#7cf4ff>%timer%</color>"
     personal-best-style: ""
-
-    empty-line-style: "empty"
+    empty-line-style: "<dark_gray>• пусто •</dark_gray>"
 
     # ADVANCED - This setting will overwrite the default-line setting for a specific line (keep the line empty if you don't want to change the line.)
     lines:
@@ -76,6 +75,21 @@ formatting:
       -
       -
 
-settings:
-  parkour-timeout:
-  allow-fly: false
+  display-item:
+    enabled: true
+    item: "minecraft:stone"
+    enchant-glint: true
+    spin-enabled: true
+    spin-interval-ticks: 1
+
+holograms:
+  enabled: true
+  update-interval-ticks: 100
+
+velocity:
+  enabled: true
+  channel: "hubparkour:records"
+  broadcast-format: "<gold>[Parkour]</gold> <yellow>%player_name%</yellow> set a new record on <white>%parkour_name%</white>: <green>%timer%</green> (#%position%)"
+  # Global top records (across all parkours) broadcast
+  global-broadcast-top: 5
+  global-broadcast-format: "<gold>[Parkour]</gold> <yellow>%player_name%</yellow> вошёл в мировой топ на <white>%parkour_name%</white>: <green>%timer%</green> (#%position%)"

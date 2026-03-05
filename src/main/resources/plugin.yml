@@ -1,18 +1,14 @@
-name: Lobby-Parkour
-version: '1.1.1'
-main: net.crumb.lobbyParkour.LobbyParkour
-description: A plugin that adds an easy controllable lobby parkour
-api-version: '1.21'
-author: crumb
-folia-supported: true
-softdepend: ["PlaceholderAPI"]
+name: HubParkour
+main: org.ayosynk.hubparkour.HubParkourPlugin
+version: 0.1.0
+api-version: 1.20
+author: ayosynk
+softdepend: [PlaceholderAPI, FancyHolograms]
 commands:
-  lpk:
-    description: Main command
-    usage: /lpk <args>
-    aliases: lobby-parkour
-
+  parkour:
+    description: Hub parkour management.
+    usage: /parkour
+    permission: hubparkour.admin
 permissions:
-  lpk.admin:
-    description: Allows a player to access all /lpk <args> commands
+  hubparkour.admin:
     default: op

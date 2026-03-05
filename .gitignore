@@ -1,3 +1,10 @@
-/build/
-/.gradle/
-/.gitignore
+.gradle/
+build/
+bin/
+.idea/
+.vscode/
+*.iml
+reference/
+cfr.jar
+gradle-8.8/
+gradle-8.8-bin.zip
