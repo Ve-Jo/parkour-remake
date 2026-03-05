@@ -48,12 +48,10 @@ tasks.register('deploy', Copy) {
     dependsOn(tasks.shadowJar)
     from(tasks.shadowJar.archiveFile)
     onlyIf { deployTargetDir.present }
-    into(deployTargetDir.get())
+    into(deployTargetDir.map { file(it) })
     doNotTrackState('Deploy target contains server-managed files that are not readable during builds.')
 }
 
 tasks.named('build') {
-    if (deployTargetDir.present) {
-        finalizedBy(tasks.named('deploy'))
-    }
+    finalizedBy(tasks.named('deploy'))
 }
